@@ -16,12 +16,20 @@ type Ticker struct {
 	Vol  string `json:"vol"`
 	Buy  string `json:"buy"`
 }
+type Mercadobitcoin struct {
+	Ticker Ticker `json:"ticker"`
+}
 
 func coinMarket(w http.ResponseWriter, r *http.Request) {
 	resp, _ := http.Get("https://www.mercadobitcoin.net/api/BTC/ticker/")
 	body, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	fmt.Fprintf(w, string(body))
+	responseData := Mercadobitcoin{}
+	err := json.Unmarshal(body, &responseData)
+	if err != nil {
+		print(err)
+	}
+	fmt.Fprintf(w, responseData.Ticker.Buy)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
