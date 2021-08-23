@@ -2,14 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 type Coins struct {
-	ID   int
-	Name string
+	ID    int
+	Name  string
+	Value string
 }
 type Ticker struct {
 	High string `json:"high"`
@@ -29,7 +29,13 @@ func coinMarket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		print(err)
 	}
-	fmt.Fprintf(w, responseData.Ticker.Buy)
+	json.NewEncoder(w).Encode([]Coins{
+		{
+			ID:    1,
+			Name:  "Bitcoin",
+			Value: responseData.Ticker.Buy,
+		},
+	})
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
