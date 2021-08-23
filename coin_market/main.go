@@ -2,59 +2,39 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
-type Coins struct {
-	ID    int
-	Name  string
-	Value string
-}
-type Ticker struct {
-	High string `json:"high"`
-	Vol  string `json:"vol"`
-	Buy  string `json:"buy"`
-}
-type Mercadobitcoin struct {
-	Ticker Ticker `json:"ticker"`
+type Cat struct {
+	Name   string `json:"name"`
+	Rank   string `json:"rank"`
+	Supply string `json:"circulating_supply"`
 }
 
-func coinMarket(w http.ResponseWriter, r *http.Request) {
-	resp, _ := http.Get("https://www.mercadobitcoin.net/api/BTC/ticker/")
-	body, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	responseData := Mercadobitcoin{}
-	err := json.Unmarshal(body, &responseData)
+func index(w http.ResponseWriter, r *http.Request) {
+	resp, err := http.Get("https://6123b9b0124d880017568442.mockapi.io/coin/data")
 	if err != nil {
 		print(err)
 	}
-	json.NewEncoder(w).Encode([]Coins{
-		{
-			ID:    1,
-			Name:  "Bitcoin",
-			Value: responseData.Ticker.Buy,
-		},
-	})
-}
+	body, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	responseData := Cat{}
+	json.Unmarshal(body, &responseData)
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	// http.ServeFile(w, r, "./static/index.html")
+	fmt.Println(responseData)
 
-	json.NewEncoder(w).Encode([]Coins{
-		{
-			ID:   1,
-			Name: "Bitcoin",
-		},
-		{
-			ID:   2,
-			Name: "Dodgecoin",
-		},
-	})
+	//json.NewEncoder(w).Encode([]Cat{
+	//	{
+	//		Rank:   responseData.Rank,
+	//		Name:   responseData.Name,
+	//		Supply: responseData.Supply,
+	//	},
+	//})
 }
 
 func main() {
-	http.HandleFunc("/", handler)
-	http.HandleFunc("/coin-market", coinMarket)
+	http.HandleFunc("/", index)
 	http.ListenAndServe(":3000", nil)
 }
