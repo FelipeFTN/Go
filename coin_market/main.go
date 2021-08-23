@@ -1,40 +1,43 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/url"
+	"os"
 )
 
-type Cat struct {
-	Name   string `json:"name"`
-	Rank   string `json:"rank"`
-	Supply string `json:"circulating_supply"`
-}
-
-func index(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get("https://6123b9b0124d880017568442.mockapi.io/coin/data")
-	if err != nil {
-		print(err)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	responseData := Cat{}
-	json.Unmarshal(body, &responseData)
-
-	fmt.Println(responseData)
-
-	//json.NewEncoder(w).Encode([]Cat{
-	//	{
-	//		Rank:   responseData.Rank,
-	//		Name:   responseData.Name,
-	//		Supply: responseData.Supply,
-	//	},
-	//})
+type Data struct {
+	Name string `json:"name"`
+	Rank int    `json:"rank"`
+	ID   int    `json:"id"`
 }
 
 func main() {
-	http.HandleFunc("/", index)
-	http.ListenAndServe(":3000", nil)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", nil)
+	if err != nil {
+		log.Print(err)
+		os.Exit(1)
+	}
+
+	q := url.Values{}
+	q.Add("start", "1")
+	q.Add("limit", "5000")
+	q.Add("convert", "USD")
+
+	req.Header.Set("Accepts", "application/json")
+	req.Header.Add("X-CMC_PRO_API_KEY", "99731e72-b235-475e-aedd-ae6699e0a859")
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request to server")
+		os.Exit(1)
+	}
+	fmt.Println(resp.Status)
+	respBody, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(respBody))
 }
