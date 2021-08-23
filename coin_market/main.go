@@ -1,60 +1,74 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"strings"
 )
 
-type Coins struct {
-	ID    int
-	Name  string
-	Value string
-}
-type Ticker struct {
-	High string `json:"high"`
-	Vol  string `json:"vol"`
-	Buy  string `json:"buy"`
-}
-type Mercadobitcoin struct {
-	Ticker Ticker `json:"ticker"`
-}
+func main(){
 
-func coinMarket(w http.ResponseWriter, r *http.Request) {
-	resp, _ := http.Get("https://www.mercadobitcoin.net/api/BTC/ticker/")
-	body, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	responseData := Mercadobitcoin{}
-	err := json.Unmarshal(body, &responseData)
-	if err != nil {
-		print(err)
+	response, err := http.Get("https://www.mercadobitcoin.net/api/BTC/ticker/")
+
+	if err!=nil{
+		fmt.Println("1 - error: ",err.Error())
+		return
 	}
-	json.NewEncoder(w).Encode([]Coins{
-		{
-			ID:    1,
-			Name:  "Bitcoin",
-			Value: responseData.Ticker.Buy,
-		},
-	})
-}
+	if response.StatusCode != 200{
+		fmt.Println("2 - erro de status code |",response.StatusCode)
+		return
+	}
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	// http.ServeFile(w, r, "./static/index.html")
+	body, err := io.ReadAll(response.Body)
 
-	json.NewEncoder(w).Encode([]Coins{
-		{
-			ID:   1,
-			Name: "Bitcoin",
-		},
-		{
-			ID:   2,
-			Name: "Dodgecoin",
-		},
-	})
-}
+	
 
-func main() {
-	http.HandleFunc("/", handler)
-	http.HandleFunc("/coin-market", coinMarket)
-	http.ListenAndServe(":3000", nil)
+	type bitcoin struct{
+		High string `json: "high"`
+		Low string `json: "low"`
+		Vol string `json: "vol"`
+		Last string `json: "last"`
+		Buy string `json: "buy"`
+		Sell string `json: "sell"`
+		Open string `json: "open"`
+		Date int `json: "date"`
+	}
+
+	type ticker struct{
+		Ticker bitcoin `json: "ticker"`
+	}
+
+	
+
+	var resp ticker
+
+	err = json.Unmarshal(body,&resp)
+
+	if err != nil{
+		fmt.Println("3 - error:",err.Error())
+		return
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(">>> ")
+	UserInput, _ := reader.ReadString('\n')
+	UserInput = strings.TrimSuffix(UserInput, "\n")
+
+	switch UserInput{
+	case "High": fmt.Println(resp.Ticker.High)
+	case "Low": fmt.Println(resp.Ticker.Low)
+	case "Vol": fmt.Println(resp.Ticker.Vol)
+	case "Last": fmt.Println(resp.Ticker.Last)
+	case "Buy": fmt.Println(resp.Ticker.Buy)
+	case "Sell": fmt.Println(resp.Ticker.Sell)
+	case "Open": fmt.Println(resp.Ticker.Open)
+	case "Date": fmt.Println(resp.Ticker.Date)
+	default: fmt.Println("Not found...")
+	}
+
+
 }
