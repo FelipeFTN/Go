@@ -11,7 +11,6 @@ import (
 )
 
 func main(){
-
 	response, err := http.Get("https://www.mercadobitcoin.net/api/BTC/ticker/")
 
 	if err!=nil{
@@ -23,9 +22,7 @@ func main(){
 		return
 	}
 
-	body, err := io.ReadAll(response.Body)
-
-	
+	body, err := io.ReadAll(response.Body)	
 
 	type bitcoin struct{
 		High string `json: "high"`
@@ -40,9 +37,7 @@ func main(){
 
 	type ticker struct{
 		Ticker bitcoin `json: "ticker"`
-	}
-
-	
+	}	
 
 	var resp ticker
 
