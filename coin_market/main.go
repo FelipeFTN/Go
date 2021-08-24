@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,12 +11,15 @@ import (
 )
 
 type Data struct {
-	Name string `json:"name"`
-	Rank int    `json:"rank"`
-	ID   int    `json:"id"`
+	ID     int     `json:"id"`
+	Name   string  `json:"name"`
+	Supply float64 `json:"circulating_supply"`
+}
+type GetData struct {
+	Data []Data `json:"data"`
 }
 
-func main() {
+func index(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", nil)
 	if err != nil {
@@ -37,7 +41,25 @@ func main() {
 		fmt.Println("Error sending request to server")
 		os.Exit(1)
 	}
-	fmt.Println(resp.Status)
 	respBody, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(respBody))
+	responseData := GetData{}
+
+	json.Unmarshal(respBody, &responseData)
+
+	for i := 0; i < len(responseData.Data); i++ {
+
+		json.NewEncoder(w).Encode([]Data{
+			{
+				ID:     responseData.Data[i].ID,
+				Name:   responseData.Data[i].Name,
+				Supply: responseData.Data[i].Supply,
+			},
+		})
+	}
+}
+
+func main() {
+
+	http.HandleFunc("/", index)
+	http.ListenAndServe(":3000", nil)
 }
