@@ -17,9 +17,9 @@ func TestAdd(t *testing.T) {
 	math := new(MathContract)
 
 	mathService := NewMathService(*math, 3, 1)
-	assert.Equal(mathService.Add(), 4, "they should be equal")
+	assert.Equal(4, mathService.Add(), "they should be equal")
 
-	assert.NotEqual(mathService.Add(), 5, "they should not be equal")
+	assert.NotEqual(5, mathService.Add(), "they should not be equal")
 }
 
 func TestSubtract(t *testing.T) {
@@ -27,9 +27,9 @@ func TestSubtract(t *testing.T) {
 	math := new(MathContract)
 
 	mathService := NewMathService(*math, 3, 1)
-	assert.Equal(mathService.Subtract(), 2, "they should be equal")
+	assert.Equal(2, mathService.Subtract(), "they should be equal")
 
-	assert.NotEqual(mathService.Subtract(), 4, "they should be equal")
+	assert.NotEqual(4, mathService.Subtract(), "they should be equal")
 }
 
 func TestDivide(t *testing.T) {
@@ -37,9 +37,9 @@ func TestDivide(t *testing.T) {
 	math := new(MathContract)
 
 	mathService := NewMathService(*math, 8, 2)
-	assert.Equal(mathService.Divide(), 4, "they should be equal")
+	assert.Equal(4, mathService.Divide(), "they should be equal")
 
-	assert.NotEqual(mathService.Divide(), 6, "they should be equal")
+	assert.NotEqual(6, mathService.Divide(), "they should be equal")
 }
 
 func TestMultiply(t *testing.T) {
@@ -47,9 +47,9 @@ func TestMultiply(t *testing.T) {
 	math := new(MathContract)
 
 	mathService := NewMathService(*math, 2, 2)
-	assert.Equal(mathService.Multiply(), 4, "they should be equal")
+	assert.Equal(4, mathService.Multiply(), "they should be equal")
 
-	assert.NotEqual(mathService.Multiply(), 8, "they should be equal")
+	assert.NotEqual(8, mathService.Multiply(), "they should be equal")
 }
 
 func TestAddAndMultiply(t *testing.T) {
@@ -65,5 +65,5 @@ func TestAddAndMultiply(t *testing.T) {
 
 	mockRepo.AssertExpectations(t)
 
-	assert.Equal(res, 4)
+	assert.Equal(4, res)
 }
