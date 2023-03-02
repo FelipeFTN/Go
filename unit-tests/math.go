@@ -14,31 +14,31 @@ type MathType struct {
 	MathContract MathContract
 }
 
-func NewMathService(mathContract MathContract, a int, b int) MathType {
-	return MathType{
+func NewMathService(mathContract MathContract, a int, b int) *MathType {
+	return &MathType{
 		a,
 		b,
 		mathContract,
 	}
 }
 
-func (m MathType) Add() int {
+func (m *MathType) Add() int {
 	return m.A + m.B
 }
 
-func (m MathType) Subtract() int {
+func (m *MathType) Subtract() int {
 	return m.A - m.B
 }
 
-func (m MathType) Divide() int {
+func (m *MathType) Divide() int {
 	return m.A / m.B
 }
 
-func (m MathType) Multiply() int {
+func (m *MathType) Multiply() int {
 	return m.A * m.B
 }
 
-func (m MathType) AddAndMultiply() int {
+func (m *MathType) AddAndMultiply() int {
 
 	m.A = m.MathContract.Add()
 	m.B = m.MathContract.Add()
